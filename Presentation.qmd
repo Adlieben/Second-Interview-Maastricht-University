@@ -1,0 +1,94 @@
+---
+title: "Evaluating the Use of a Mortality Score in Admitting Covid-19 Patients into Dutch Hospitals"
+author: 
+  - name: Adam Maghout
+    orcid: 0009-0002-5241-0856
+    email: a.maghout@uu.nl
+    affiliations:
+      - name: Methodology & Statistics @ UU University
+date: 19 Feb 2025
+date-format: "D MMM YYYY"
+execute: 
+  echo: true
+editor: source
+bibliography: Bibliography.bib
+format: 
+  revealjs:
+    embed-resources: true
+    progress: true
+    multiplex: true
+    transition: fade
+    slide-number: true
+    margin: 0.075
+    logo: "Images/logo.png" 
+    toc: false
+    toc-depth: 1
+    toc-title: Outline
+    scrollable: true
+    reference-location: margin
+    footer: Adam Maghout @ UU
+    preview-links: true
+    css: styles.css
+---
+
+```{r data load, echo=F, message=F, warning=F, include=F}
+# Libraries
+packages <- c("openxlsx", "tidyverse", "caret", "pROC", 
+              "yardstick", "predtools", "dcurves", "gtsummary", "MASS")
+install.packages(setdiff(packages, rownames(installed.packages())), 
+                 dependencies = TRUE)
+lapply(packages, library, character.only = TRUE)
+
+# Load data
+data <- read.xlsx("Data/covidpredict-1.xlsx")
+
+# Separate training and test set
+train <- data %>% filter(set == "dev")
+test <- data %>% filter(set != "dev")
+```
+
+## Background
+
+- Development and validation of a pragmatic risk score to predict in-hospital mortality in patients admitted to hospital with covid-19.
+
+- Analysis conducted in December 2021.
+
+- In 2021 up until December, 1 870 640 new reported cases of covid-19 and 8 109 reported deaths (@COVID19DataWHO).
+
+```{r WHO data manipulation, echo=F, message=F, warning=F, include=F}
+# Load data
+who <- read.csv("Data/WHO-COVID-19-global-data.csv") %>% 
+  filter(Country_code == "NL") %>%
+  filter(str_starts(as.character(Date_reported), "2021") & 
+           as.character(Date_reported) < "2021-12") # remove December
+
+inc <- sum(who$New_cases)
+death <- sum(who$New_deaths)
+```
+
+## Data
+
+Although the original study (@knightRiskStratificationPatients2020) included 35 463 patients in the derivation dataset and 22 361 in the validation dataset, the current dataset comprises of only:
+
+```{r data, echo=F}
+cat(paste(nrow(train), 'patients in the derivation set'))
+cat(paste(nrow(test), 'patients in the validation set'))
+```
+
+## Aim
+
+## Logistic Model
+
+## Model Validation
+
+## Decision Curve Analysis
+
+## Value-of-information
+
+## Decision
+
+## Challenges
+
+## Conclusion
+
+## Bibliography
