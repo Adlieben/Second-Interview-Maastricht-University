@@ -7,9 +7,9 @@ install.packages(setdiff(packages, rownames(installed.packages())),
 lapply(packages, library, character.only = TRUE)
 
 # Load data
-data <- read.xlsx("Data/covidpredict-1.xlsx")
+data <- read.xlsx("Data/covidpredict-1.xlsx") # Change path if necessary
 
-#### 0.1 INVESTIGATE DATA
+#### 0.1 INVESTIGATE DATA ----
 glimpse(data)
 data %>% tbl_summary(type = all_dichotomous() ~ "categorical")
 
@@ -27,6 +27,7 @@ model <- glm(mortality ~ age + female + comorbidity +
 # Quickly check model
 summary(model)
 # Initial assessment suggests that gender is not significant in the model
+# This however is not requested in the assignment
 
 #### 2. CHECK MODEL FUNCTIONALITY ----
 # Create predicted values for the test dataset created earlier
@@ -40,7 +41,7 @@ print(conf_matrix)
 # Sensitivity is low, 53% indicates that nearly half of deaths go undetected
 # High specificity so most patients not at risk are correctly identified as such
 # PPV is decently high indicating most patients identified as deaths do actually die (at least in 2/3 of cases)
-# NPV is decently high indicating predicted survival is often also correctly identified (also at least 2/3 of cases)
+# NPV is decently high indicating predicted survival is often also correctly identified (also at least in 2/3 of cases)
 # Accuracy is also acceptable, although we would like it to be higher
 
 # Compute AUC
@@ -58,9 +59,9 @@ calibration_plot(data = test, obs = "mortality", pred = "predicted",
 
 #### 3. DECISION CURVE ANALYSIS ----
 dca_an <- dca(mortality ~ predicted, data = test)
-plot(dca_an, smooth = TRUE) # added to remove statistical noise
+plot(dca_an, smooth = TRUE) # smooth = TRUE added to remove statistical noise
 
-# The curve for the model is consistently above the two others, at least from 12.5 to 80%
+# The curve for the model is consistently above the two others
 # This means the model is useful in making a decision on whether to send someone to the ICU or not
 
 # Using a risk threshold of 10% as given in the next question, we can also compare both approaches
@@ -84,11 +85,7 @@ NB*1870640 # gain in true positives
 ((1-z)/z)*NB*1870640 # reduction in false positives
 
 #### 4. VALUE-OF-INFORMATION ----
-
-# we defined the validation EVPI as the expected loss in NB due to the finiteness of an external
-# validation sample and the associated risk of incorrectly
-# identifying the optimal strategy
-
+# The steps presented here are given in Sadatsafavi et al., 2023
 n <- dim(test)[1]
 
 #Step 1: store predicted probabilities.

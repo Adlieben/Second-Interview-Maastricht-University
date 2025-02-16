@@ -1,0 +1,16 @@
+---
+title: "Evaluating the Use of a Mortality Score in Admitting Covid-19 Patients into Dutch Hospitals"
+author: "Adam Maghout"
+date: "2025-02-16"
+output: pdf_document
+---
+
+**Background**: The COVID-19 pandemic has placed immense strain on healthcare systems, necessitating reliable risk scores for clinical decision-making. This study evaluates the use of a mortality prediction score to guide ICU admissions in Dutch hospitals. The aim is to relieve hospitals of patients unlikely to develop complications from the disease whilst prioritising persons at risk.
+
+**Methods**: A logistic regression model was developed using a training dataset and validated on a separate test dataset. Predictive performance was evaluated using discrimination (AUC), sensitivity, specificity, and a calibration plot. Decision curve analysis (DCA) was used to assess net benefit (NB) of trusting the model compared to the strategy of admitting all patients. The expected value of perfect information (EVPI) was computed via bootstrap-based Monte Carlo simulation to quantify the impact of uncertainty in decision-making.
+
+**Results**: The model demonstrated acceptable AUC, good calibration and high specificity but low sensitivity due to the small sample size in the training dataset. DCA results suggest that using the model improves ICU admission decisions, with a net benefit of 0.003 at a 10% risk threshold. EVPI analysis indicated that additional external validation would provide minimal incremental benefit, as the reduction in uncertainty would not significantly affect decision-making outcomes.
+
+**Conclusion**: The findings support the use of the mortality prediction score to aid ICU admission decisions in Dutch hospitals. Given the minimal expected benefit from further external validation, resources may be better allocated to implementation and refinement of the model rather than additional validation studies.
+
+**Word count: 245**
