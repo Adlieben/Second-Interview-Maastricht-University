@@ -49,11 +49,12 @@ test <- data %>% filter(set != "dev")
 
 ## Background
 
+::: {.incremental}
 - Development and validation of a pragmatic risk score to predict in-hospital mortality in patients admitted to hospital with covid-19.
-
 - Analysis conducted in December 2021.
-
-- In 2021 up until December, 1 870 640 new reported cases of covid-19 and 8 109 reported deaths (@COVID19DataWHO).
+- In 2021 up until December, 1 870 640 new reported cases of covid-19 and 8 109 reported deaths [@COVID19DataWHO].
+- Important to hospitalise at-risk patients without overburdening healthcare facilities.
+:::
 
 ```{r WHO data manipulation, echo=F, message=F, warning=F, include=F}
 # Load data
@@ -67,19 +68,98 @@ death <- sum(who$New_deaths)
 ```
 
 ## Data
+<div class="slide-body">
+Data is based on a prospective observational cohort study from @knightRiskStratificationPatients2020 in 260 hospitals across England, Scotland, and Wales, on adults (age ≥18 years) admitted to hospital between 6 February 2020 and 29 June 2020 with covid-19.
 
-Although the original study (@knightRiskStratificationPatients2020) included 35 463 patients in the derivation dataset and 22 361 in the validation dataset, the current dataset comprises of only:
+Although the original study included 35 463 patients in the derivation dataset and 22 361 in the validation dataset, the current dataset comprises of only:
 
-```{r data, echo=F}
-cat(paste(nrow(train), 'patients in the derivation set'))
-cat(paste(nrow(test), 'patients in the validation set'))
+```{r data 1, echo=F}
+knitr::asis_output(
+  sprintf(
+    "<div>%d patients in the derivation set<br>%d patients in the validation set</div>",
+    nrow(train), nrow(test)
+  )
+)
 ```
+</div>
 
-## Aim
+## Data
+::: columns
+
+::: column
+<small>
+  <ul>
+    <li>`rr`: respiratory rate breaths/min.</li>
+    <li>`oxygen_sat`: peripheral oxygen saturation in %.</li>
+    <li>`urea`: urea level in mm/L.</li>
+    <li>`crp`: C reactive protein in mg/L.</li>
+    <li>`gcs`: level of consciousness on the Glasgow coma scale.</li>
+    <li>`age`: age in years.</li>
+    <li>`female`: sex (female = 1, male = 0).</li>
+    <li>`comorbidity`: number of comorbidities, including obesity, chronic cardiac disease, etc.</li>
+    <li>`date`: unit unclear.</li>
+    <li>`set`: identifier for the development and validation sets.</li>
+    <li>`mortality`: in-hospital mortality during study.</li>
+  </ul>
+</small>
+:::
+
+::: column
+<div style="overflow-y: auto; max-height: 550px;">
+```{r data 2, echo=F}
+data %>% tbl_summary(type = all_dichotomous() ~ "categorical")
+```
+</div>
+:::
+:::
+
+## Aims
+
+::: {.incremental}
+- Fitting a logistic model to predict `mortality` from the other variables.
+- Conduct a Decision Curve Analysis (DCA) to evaluate the net benefit (NB) of using the model.
+- Obtain the Expected Value of Perfect Information (EVPI) of the model.
+:::
 
 ## Logistic Model
 
-## Model Validation
+```{r logistic model}
+#| code-line-numbers: "3"
+model <- glm(mortality ~ age + female + comorbidity +
+               rr + oxygen_sat + gcs + urea + crp,
+             data = train,
+             family = binomial)
+summary(model)
+```
+
+## Temporal Validation
+
+### Specificity, sensitivity, PPV and NPV
+
+<small>
+The model is now run on the validation set collected between 21 May and 29 June 2020.
+</small>
+
+```{r temp 1, echo=F}
+test$predicted <- predict(model, test, type = "response")
+
+conf_matrix <- confusionMatrix(factor(round(test$predicted)), 
+                               factor(test$mortality))
+print(conf_matrix)
+```
+
+## Temporal Validation
+
+### Calibration plot
+
+```{r temp 2, echo=F}
+plot <- calibration_plot(data = test, obs = "mortality", pred = "predicted", 
+                 y_lim = c(0, 1), x_lim=c(0, 1),
+                 title = "Calibration plot for validation data")$calibration_plot
+plot$layers[[1]]$aes_params$colour <- '#EFC251' # minor aesthetic tweak
+plot$layers[[2]]$aes_params$colour <- '#EFC251'
+plot
+```
 
 ## Decision Curve Analysis
 

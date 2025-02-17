@@ -1,3 +1,30 @@
 .reveal h1.title {
     font-size: 60px !important;
 }
+
+.reveal section .slide-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 160px);
+}
+
+.reveal .my-big-output {
+  overflow: visible !important;
+  font-size: 1.2em !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  padding: 0;
+  margin: 0;
+}
+
+.small-text {
+  font-size: 0.8em;
+}
+
+.reveal h3 {
+  color:  #EFC251 !important;
+  font-size: 0.9em !important;
+  font-weight: normal !important;
+}

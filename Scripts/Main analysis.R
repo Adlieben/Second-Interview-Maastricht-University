@@ -36,7 +36,7 @@ test$predicted <- predict(model, test, type = "response")
 
 # Create a confusion matrix for sensitivity, specificity, PPV and NPV
 conf_matrix <- confusionMatrix(factor(round(test$predicted)), 
-                               factor(test$mortality), positive = "1")
+                               factor(test$mortality))
 print(conf_matrix)
 # Sensitivity is low, 53% indicates that nearly half of deaths go undetected
 # High specificity so most patients not at risk are correctly identified as such
