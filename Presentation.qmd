@@ -123,7 +123,7 @@ data %>% tbl_summary(type = all_dichotomous() ~ "categorical")
 
 ## Aims
 
-![Population](Images/Population.png)
+![](Images/Population.png)
 
 ## Logistic Model
 
@@ -219,7 +219,7 @@ NB*1870640 # gain in true positives
 ## Decision Curve Analysis
 ### Decision
 
-![Population](Images/Population 2.png)
+![](Images/Population 2.png)
 
 ## Value-of-information
 ### Expected Value of Perfect Information (EVPI)
@@ -233,17 +233,62 @@ An EVPI indicates how much NB is expected to be lost due to the model being impe
 :::
 
 ## Value-of-information
+### Analysis
 
+```{r EVPI, echo=T, cache=T}
+n <- nrow(test)
 
+#Step 1: store predicted probabilities.
+pi <- test$predicted
+
+#Step 2: The bootstrap Monte Carlo simulation
+set.seed(123)
+N <- 10000
+NBmodel <- NBall <- rep(0,N)
+for(i in 1:N) {
+  bsdata <-  test[sample(1:n, n, replace = T),]
+  NBall[i] <- mean(bsdata$mortality-(1-bsdata$mortality)*z/(1-z))
+  NBmodel[i] <- mean((bsdata$predicted>z)*(bsdata$mortality-(1-bsdata$mortality)*z/(1-z)))
+}
+
+#Step 3: EVPI calculation
+EVPI <- mean(pmax(0,NBmodel,NBall))-max(0,mean(NBmodel),mean(NBall))
+EVPI
+```
+
+## Value-of-information
+### Decision
+
+For 1000 patients:
+
+```{r VOI 1, echo=T}
+EVPI*1000 # gain in true positives
+((1-z)/z)*EVPI*1000 # reduction in false positives
+```
+
+For 1 870 640 patients:
+
+```{r VOI 2, echo=T}
+EVPI*1870640 # gain in true positives
+((1-z)/z)*EVPI*1870640 # reduction in false positives
+```
+
+Given the cost of additional research, both in terms of time wasted to use the model and in financial costs, additional research seems unnecessary.
 
 ## Final Decision
+
+The findings support the use of the mortality prediction score to aid ICU admission decisions in Dutch hospitals. 
+
+Given the minimal expected benefit from further external validation, resources may be better allocated to implementation and refinement of the model rather than additional validation studies.
 
 ## Challenges
 
 ::: {.incremental}
+- Decisions seem arbitrary without additional financial aspects.
+- Confusion concerning how the model can be relevant given the minimal sample size.
+- Difficulties following the calculations presented in the recommended paper.
 - Confusion surrounding the difference between an ordinary and a Bayesian bootstrap.
+- Eager to undertake potential challenges associated with the EVSI but don't know where to start.
 :::
-
-## Conclusion
 
 ## Bibliography
