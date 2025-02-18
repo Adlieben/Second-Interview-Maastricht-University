@@ -121,6 +121,10 @@ data %>% tbl_summary(type = all_dichotomous() ~ "categorical")
 - Obtain the Expected Value of Perfect Information (EVPI) of the model.
 :::
 
+## Aims
+
+![Population](Images/Population.png)
+
 ## Logistic Model
 
 ```{r logistic model}
@@ -163,11 +167,82 @@ plot
 
 ## Decision Curve Analysis
 
+```{r DCA 1, echo=F, message=F}
+dca_an <- dca(mortality ~ predicted, data = test)
+plot(dca_an, smooth = TRUE, style = "bw")
+```
+
+## Decision Curve Analysis
+
+Assuming that the risk threshold `z` above which patients are admitted to ICU is 10%:
+
+```{r DCA 2, echo=T}
+dca_an %>%
+  as_tibble() %>%
+  filter(threshold %in% seq(0.05, 0.15, by = 0.05)) %>%
+  dplyr::select(variable, threshold, net_benefit) %>%
+  pivot_wider(id_cols = threshold, 
+              names_from = variable,
+              values_from = net_benefit)
+```
+
+The net benefit of using the model is **0.003**.
+
+## Decision Curve Analysis
+### Implications of the net benefit
+
+```{r DCA 3, echo=F}
+NB <- 0.003 # observed above
+z <- 0.1 #Risk threshold, given as 10%
+```
+
+The NB is defined as the proportion of additional true positives identified and:
+
+$$
+TP = \frac{z}{1-z}FP
+$$
+
+For 1000 patients:
+
+```{r DCA 4, echo=T}
+NB*1000 # gain in true positives
+((1-z)/z)*NB*1000 # reduction in false positives
+```
+
+For 1 870 640 patients:
+
+```{r DCA 5, echo=T}
+NB*1870640 # gain in true positives
+((1-z)/z)*NB*1870640 # reduction in false positives
+```
+
+## Decision Curve Analysis
+### Decision
+
+![Population](Images/Population 2.png)
+
+## Value-of-information
+### Expected Value of Perfect Information (EVPI)
+
+An EVPI indicates how much NB is expected to be lost due to the model being imperfect. @sadatsafaviValueofInformationAnalysisExternal2023 propose several ways to compute it:
+
+::: {.incremental}
+- Bayesian bootstrapping
+- Ordinary bootstrapping
+- Asymptotic approach based on central limit theorem
+:::
+
 ## Value-of-information
 
-## Decision
+
+
+## Final Decision
 
 ## Challenges
+
+::: {.incremental}
+- Confusion surrounding the difference between an ordinary and a Bayesian bootstrap.
+:::
 
 ## Conclusion
 
